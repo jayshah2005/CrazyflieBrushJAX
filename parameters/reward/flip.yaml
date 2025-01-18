@@ -1,0 +1,31 @@
+pos_x_range: [-1.5, 1.5]
+pos_y_range: [-0.8, 0.8]
+pos_z_range: [1.0, 2.0]
+pos_coef: 0.0
+max_pos_diff: 0.3
+
+vel_coef: 2.0
+target_vel_max: 8.0
+warmup_time: 0.4
+max_vel_diff: 20.0
+max_vel_diff2: 1.0
+vel_coef2: 1.0
+vel_reward_shape: "triangle"   
+
+quat_coef: 0.7
+max_quat_diff: 3.0
+quat_reward_shape: "gaussian"
+
+rot_speed: 3.5
+pitch_coef: 1.0
+max_pitch_diff: 20.0
+max_pitch_diff2: 7.0
+pitch_coef2: 0.0
+pitch_reward_shape: "triangle"
+
+max_pos_fail_x: 3.1
+max_pos_fail_y: 1.6
+max_pos_fail_z: 20.0
+max_vel_fail: 10.0
+max_ang_rate_fail: 30
+fail_penalty: 300.0

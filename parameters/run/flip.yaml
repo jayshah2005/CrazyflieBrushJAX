@@ -1,0 +1,25 @@
+# @package _global_
+defaults:
+  - override /reward: flip
+
+system:
+  reset_pos_x_range: [-0.2, 0.2]
+  reset_pos_y_range: [-0.2, 0.2]
+  reset_pos_z_range: [0.5, 4.0]
+  reset_quat_x: 1.0                      
+  reset_quat_y: 0.01
+  reset_quat_z: 0.01
+  reset_quat_angle: 0.01  # in 2* pi
+
+  reset_velocity_x_max: [-0.5, 0.5]
+  reset_velocity_y_max: [-0.5, 0.5]
+  reset_velocity_z_max: [0.0, 6.0]
+  reset_angular_velocity_x_max: [-15.0, 15.0]
+  reset_angular_velocity_y_max: [-0.5, 0.5]
+  reset_angular_velocity_z_max: [-0.5, 0.5]
+
+  vel_coef: 0.1
+  vel_coef2: 0.01
+
+
+experiment_file_label: flip

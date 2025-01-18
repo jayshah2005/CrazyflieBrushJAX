@@ -1,0 +1,28 @@
+# @package _global_
+defaults:
+  - override /reward: target_control
+
+system:
+  reset_pos_x_range: [-2.0, 2.0]
+  reset_pos_y_range: [-2.0, 2.0]
+  reset_pos_z_range: [0.1, 6.0]
+  reset_velocity_x_max: [-2.0, 2.0]
+  reset_velocity_y_max: [-2.0, 2.0]
+  reset_velocity_z_max: [-5.0, 5.0]
+  reset_angular_velocity_x_max: [-2.0, 2.0]
+  reset_angular_velocity_y_max: [-2.0, 2.0]
+  reset_angular_velocity_z_max: [-2.0, 2.0]
+
+reward:
+  train_simple_controller: false
+  use_i_term: false
+  min_pos_fail_z: 0.0 #2.9
+  
+  pos_coef: 1.0
+  max_pos_diff: 7.0
+  pos_coef2: 2.0
+  max_pos_diff2: 3.0
+  pos_coef3: 1.0
+  max_pos_diff3: 1.0
+
+experiment_file_label: target_control_flip

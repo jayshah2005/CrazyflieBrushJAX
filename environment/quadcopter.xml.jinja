@@ -1,0 +1,105 @@
+<mujoco model="coupled_quadcopters">
+    
+    <include file="{{scene_path}}/scene.xml"/>
+
+    <!--
+    <option gravity="0 0 0" timestep="0.001" />
+    <option gravity="0 0 -9.81"/>
+    <default>
+        <geom solref="0.002 1"/>
+    </default>
+    -->
+
+    <option gravity="0 0 -9.81" timestep="0.0001" integrator="Euler"/>
+
+    <extension>
+        <plugin plugin="mujoco.elasticity.cable"/>
+    </extension>
+
+    <visual>
+        <global elevation="-30"/>
+    </visual>
+
+    <compiler inertiafromgeom="auto" coordinate="local" autolimits="true" balanceinertia="true"/>
+
+    <worldbody>
+
+        <!--geom name="floor" pos="0 0 0" size="2 2 .2" type="plane"  conaffinity="1" rgba="1 1 1 1" condim="3"/-->
+        
+        <body name="quadcopter_1" pos="{{position_body1[0]}} {{position_body1[1]}} {{position_body1[2]}}" quat="{{quat_body1[0]}} {{quat_body1[1]}} {{quat_body1[2]}} {{quat_body1[3]}}">
+            <!-- Size parameters contain half sizes -->
+            <geom name="body_1" type="box" pos="0.0 0.0 0.0" quat = "1. 0. 0. 0" size="{{quadcopter_dimension / 4}} {{quadcopter_dimension / 4}} 0.01"  rgba="0.3 0.3 0.8 1" mass = "{{mass_body1}}"/>
+
+            
+			<!-- Motor sites to attach motor actuators -->
+            <site name="motor0_1" type="cylinder" pos="{{quadcopter_dimension / 2 + mass_offsetx}}  {{(-quadcopter_dimension / 2) + mass_offsety}} 0.01"  size="0.01 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+            <site name="motor1_1" type="cylinder" pos="{{(-quadcopter_dimension / 2) + mass_offsetx}}   {{(-quadcopter_dimension / 2) + mass_offsety}} 0.01"  size="0.01 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+            <site name="motor2_1" type="cylinder" pos="{{(-quadcopter_dimension / 2) + mass_offsetx}}  {{quadcopter_dimension / 2 + mass_offsety}} 0.01"  size="0.01 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+            <site name="motor3_1" type="cylinder" pos="{{quadcopter_dimension / 2 + mass_offsetx}}  {{quadcopter_dimension / 2 + mass_offsety}} 0.01"  size="0.01 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+
+			<!-- Thruster geometries for collisions since site's are excluded from collision checking -->
+            <geom name="thruster0_1" type="cylinder" pos=" {{quadcopter_dimension / 2}}  -{{quadcopter_dimension / 2}}  0.01" size="0.03 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1" mass = "{{mass_rotor1}}"/>
+            <geom name="thruster1_1" type="cylinder" pos=" -{{quadcopter_dimension / 2}} -{{quadcopter_dimension / 2}}  0.01" size="0.03 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1" mass = "{{mass_rotor1}}"/>
+            <geom name="thruster2_1" type="cylinder" pos="-{{quadcopter_dimension / 2}} {{quadcopter_dimension / 2}}  0.01" size="0.03 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1" mass = "{{mass_rotor1}}"/>
+            <geom name="thruster3_1" type="cylinder" pos="{{quadcopter_dimension / 2}}  {{quadcopter_dimension / 2}}  0.01" size="0.03 0.0025"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1" mass = "{{mass_rotor1}}"/>
+
+            <!-- state noise as force -->
+            <site name="noise0_f1" type="sphere" pos="0.0 0.0 0.0"  size="0.01"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+            <site name="noise0_f2" type="sphere" pos="0.0 0.0 0.0"  size="0.01"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+            <site name="noise0_f3" type="sphere" pos="0.0 0.0 0.0"  size="0.01"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+
+            <!-- state noise as torque -->
+            <site name="noise0_t1" type="sphere" pos="0.0 0.0 0.0"  size="0.01"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+            <site name="noise0_t2" type="sphere" pos="0.0 0.0 0.0"  size="0.01"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+            <site name="noise0_t3" type="sphere" pos="0.0 0.0 0.0"  size="0.01"  quat = "1.0 0.0 0.0 0." rgba="0.3 0.8 0.3 1"/>
+
+
+            <!-- Visualization of the coordinate frame -->
+			<site name="qcX_1" type="box" pos="0.1 0.0 0.0" size="0.1 0.005 0.005"  quat = " 1.000  0.0  0.0    0."     rgba="1 0 0 1" />
+			<site name="qcY_1" type="box" pos="0.0 0.1 0.0" size="0.1 0.005 0.005"  quat = " 0.707  0.0  0.0    0.707"  rgba="0 1 0 1" />
+			<site name="qcZ_1" type="box" pos="0.0 0.0 0.1" size="0.1 0.005 0.005"  quat = "-0.707  0.0  0.707  0."     rgba="0 0 1 1" />
+
+            <!-- Free joint makes quadcopter floating body -->
+			<joint name="root_1"   type="free" damping="0" armature="0" pos="0 0 0"/>
+
+            <site name="cable_begin" pos="0 0 -0.025" size="0.01" rgba="1 0 0 1"/>
+
+            <!-- Visualisation of Ball joint for rope connection, position on center of bottom of drone body -->
+            
+            <!--<body name="connection_quad" pos="0.05 -0.05 -0.01">
+                <joint name="connection1_ball"   type="ball" damping="0" armature="0" pos="0 0 0" />
+                <geom size=".01" mass="0.0001"/>
+            </body>-->
+
+            <inertial pos="0.0 0.0 0.0" quat="1.0 0.0 0.0 0.0" mass="{{"%.8f"|format(mass_body1)}}" diaginertia="{{"%.8f"|format(inertia_x)}} {{"%.8f"|format(inertia_y)}} {{"%.8f"|format(inertia_z)}}" />
+
+            {{auxilliary_body}}
+        </body>
+
+    </worldbody>
+
+    {{auxilliary_equality_constraints}}
+
+    <actuator>
+        <!-- thrusters -->
+        <motor ctrllimited="true" ctrlrange="0.0 {{max_thrust1}}" gear="0  0. {{thrust_multiplier1}} 0. 0. 0." site="motor0_1"/>
+        <motor ctrllimited="true" ctrlrange="0.0 {{max_thrust1}}" gear="0  0. {{thrust_multiplier2}} 0. 0. 0." site="motor1_1"/>
+        <motor ctrllimited="true" ctrlrange="0.0 {{max_thrust1}}" gear="0  0. {{thrust_multiplier3}} 0. 0. 0." site="motor2_1"/>
+        <motor ctrllimited="true" ctrlrange="0.0 {{max_thrust1}}" gear="0  0. {{thrust_multiplier4}} 0. 0. 0." site="motor3_1"/>
+
+        <!-- torque of thrusters -->
+        <motor ctrllimited="false" gear="0  0. 0. 0. 0. -{{max_torque_multiplier1}}" site="motor0_1"/>
+        <motor ctrllimited="false" gear="0  0. 0. 0. 0.  {{max_torque_multiplier2}}" site="motor1_1"/>
+        <motor ctrllimited="false" gear="0  0. 0. 0. 0. -{{max_torque_multiplier3}}" site="motor2_1"/>
+        <motor ctrllimited="false" gear="0  0. 0. 0. 0.  {{max_torque_multiplier4}}" site="motor3_1"/>
+
+        <!-- noise -->
+        <!--<motor gear="1. 0. 0. 0. 0. 0." site="noise0_f1"/>
+        <motor gear="0. 1. 0. 0. 0. 0." site="noise0_f2"/>
+        <motor gear="0. 0. 1. 0. 0. 0." site="noise0_f3"/>
+
+        <motor gear="0. 0. 0. 1. 0. 0." site="noise0_t1"/>
+        <motor gear="0. 0. 0. 0. 1. 0." site="noise0_t2"/>
+        <motor gear="0. 0. 0. 0. 0. 1." site="noise0_t3"/>-->
+    </actuator>
+</mujoco>

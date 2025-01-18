@@ -1,0 +1,47 @@
+defaults:
+  - reward: target_control
+  - system: quadcopter
+  - _self_
+
+
+put_params_in_policy: false
+num_systems: 8192
+
+n_trials: 100
+n_jobs: 10
+
+total_timesteps: 2 # 10000000
+num_resets_per_eval: 1
+learning_rate: 3e-4  # 5e-4
+entropy_cost: 1e-4
+discounting: 0.99
+num_minibatches_multiplier: 6
+num_updates_per_batch: 14
+unroll_length: 100
+episode_length: 2000
+observation_scaling: 1.0
+
+seed: 0
+debug_mode: true
+
+print_console: true
+
+GPU_MEM_FRACTION: 0.7
+
+experiment_name_wandb: mjx
+
+experiment_file_label: training
+
+wandb_log: true
+wandb_project: "${experiment_file_label}"
+wandb_entity: "federated_learning_multi_hop"
+
+root_dir: "/my_log_dir"
+
+hydra:
+  job:
+    chdir: True
+  run:
+    dir: ${root_dir}/${experiment_file_label}
+  sweep:
+    dir: ${root_dir}/${experiment_file_label}

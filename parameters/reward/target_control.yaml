@@ -1,0 +1,63 @@
+train_simple_controller: true
+
+use_i_term: false
+i_scaling: 10.0
+i_term_coef: 0.0
+max_i_term_diff: 1.0
+i_term_reward_shape: "triangle"
+pos_coef: 1.0
+max_pos_diff: 9.0
+pos_coef2: 2.0
+max_pos_diff2: 3.0
+pos_coef3: 0.5
+max_pos_diff3: 1.5
+pos_reward_shape: "triangle"
+pos_reward_shape3: "gaussian"
+
+action_coef: 0.0
+max_action_diff: 0.5
+action_reward_shape: "gaussian"
+
+vel_coef: 0.05
+max_vel_diff: 10.0
+vel_reward_shape: "triangle"   
+
+vertical_vel_coef: 0.15
+max_vertical_vel_diff: 1.0
+
+quat_coef: 0.15
+max_quat_diff: 2.0
+quat_reward_shape: "gaussian"
+
+yaw_coef: 0.0
+max_yaw_diff: 4.0
+yaw_reward_shape: "triangle"
+
+ang_rate_coef: 0.15
+max_ang_rate_diff: 10.0
+ang_rate_reward_shape: "gaussian"
+
+torque_coef: 0.02
+torque_reward_shape: "triangle"
+torque_max_diff: 0.5
+
+action_diff_coef: 0.0
+max_action_diff_diff: 1.0
+action_diff_reward_shape: "gaussian"  
+
+pos_ang_rate_coef: 0.0
+max_pos_ang_rate_diff: 2.0
+pos_ang_rate_reward_shape: "triangle"
+
+rolling_coef: 0.0
+max_rolling_diff: 5.0
+rolling_reward_shape: "gaussian"
+rolling_speed: 5.0
+
+max_pos_fail_x: 8.5
+max_pos_fail_y: 8.5
+max_pos_fail_z: 4.5
+min_pos_fail_z: -4.5
+max_vel_fail: 10.0
+max_ang_rate_fail: 30
+fail_penalty: 300.0  # 300.0

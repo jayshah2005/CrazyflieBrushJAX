@@ -1,0 +1,51 @@
+simulation_dt: 0.004
+use_delay_coord: true
+observe_omega: true
+
+reset_pos_x_range: [-6.0, 6.0]
+reset_pos_y_range: [-6.0, 6.0]
+reset_pos_z_range: [-3.0, 3.0]
+
+# quaternions reset values. When reseting the environment, we sample the 
+# alpha between -2pi,2pi, x, y, z between reset_quat_... , 
+# normalize [x, y, z] to length one and then set q = [cos(alpha/2), x*sin(alpha/2), y*sin(alpha/2), z*sin(alpha/2)].
+# Through this, the yaw is always sampled uniformly between -pi, pi,
+# but the pitch and roll are not (to avoid the drone start overhead).
+reset_quat_x: 0.1  # 0.1                      
+reset_quat_y: 0.1  # 0.1
+reset_quat_z: 1.0
+reset_quat_angle: 1  # in 2* pi
+
+reset_velocity_x_max: [-2.0, 2.0]
+reset_velocity_y_max: [-2.0, 2.0]
+reset_velocity_z_max: [-2.0, 2.0]
+reset_angular_velocity_x_max: [-2.0, 2.0]
+reset_angular_velocity_y_max: [-2.0, 2.0]
+reset_angular_velocity_z_max: [-2.0, 2.0]
+
+# the vicon system always has some error in the pose (e.g., when not calibrated correctly or the markers move a bit).
+# so we simulate this. 
+# this angle is the maximum error in the pose at reset (we rotate the pose by a random quaternion with this angle).
+reset_pose_error_angle: 0.26
+reset_pose_error_pos: 0.0  # 0.01
+
+reset_motor_model_scale: 0.2
+reset_motor_diff_scale: 0.1
+
+velocity_noise_scale: 0.01             # noise of the velocity
+angular_rate_noise_scale: 0.01         # noise of the angular rate
+measurement_noise_scale:  0.01          # noise of the measurement
+motor_noise_scale: 1.0                 # noise of the motor, added onto the motor Omega at every timestep
+# domain randomization parameters
+dr_scaling: 1.0                             # scaling factor for domain randomization (to be able to quickly turn it off)
+dr_mass_body: 0.1                  
+dr_inertia: 0.2
+dr_thrust: 0.2
+dr_torque: 0.2
+dr_mass_offset: 0.01
+
+# # observation parameters
+action_delay: 2
+# num_past_states: 0
+# num_past_actions: 4
+

@@ -1,0 +1,24 @@
+# @package _global_
+defaults:
+  - override /hydra/launcher: submitit_slurm
+
+root_dir: "/work/p0021919/RIG"
+
+hydra: 
+  launcher: # https://hydra.cc/docs/plugins/submitit_launcher/
+    gres: gpu:1
+    account: p0021919
+    submitit_folder: ${hydra.sweep.dir}/.submitit/%j
+    array_parallelism: 35
+    cpus_per_task: 24
+    additional_parameters:
+      output: /work/mf724021/slurm_output/%A_%a.out
+      error: /work/mf724021/slurm_output/%A_%a.err
+      time: 0-5:00:00
+
+    setup: [
+      "module load GCCcore/.13.3.0",
+      "module load Python/3.12.3",
+      "echo '# Activate venv!'", ". ./venv_mjx/bin/activate", 
+    ]
+
