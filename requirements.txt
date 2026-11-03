@@ -6,7 +6,7 @@ blinker
 brax==0.14.2  # needs jax<0.10 (uses jax.device_put_replicated)
 certifi
 charset-normalizer
-chex
+chex==0.1.92
 click
 contourpy
 cycler
@@ -47,9 +47,9 @@ ml_collections
 ml_dtypes
 mpmath
 msgpack
-mujoco
-mujoco-mjx
-mujoco-warp
+mujoco==3.17.0
+mujoco-mjx==3.17.0
+mujoco-warp==3.17.0
 multipledispatch
 mypy_extensions
 nest-asyncio
@@ -58,9 +58,9 @@ numpy
 omegaconf
 opencv-python
 opt_einsum
-optax
+optax==0.2.8
 orbax
-orbax-checkpoint
+orbax-checkpoint==0.12.9
 packaging
 parso
 pexpect

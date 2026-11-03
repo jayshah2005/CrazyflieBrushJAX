@@ -15,8 +15,8 @@ static void fc_layer(float *input, float *output, const float *kernel, const flo
 }
 
 void forward_{{name}}(float *input, float *output) {
-    float buffer1[32]; // Adjust size as needed
-    float buffer2[32]; // Adjust size as needed
+    float buffer1[{{ hidden_dim | default(32) }}];
+    float buffer2[{{ hidden_dim | default(32) }}];
     float *current_input = buffer1;
     float *current_output = buffer2;
     float *temp;

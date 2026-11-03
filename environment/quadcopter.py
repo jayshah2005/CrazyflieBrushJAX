@@ -189,8 +189,6 @@ class Quadcopter(PipelineEnv, ABC):
 
         output = template_xml_file.render(config)
 
-        print(output)
-
         mj_model = mujoco.MjModel.from_xml_string(output)
         mj_model.opt.solver = mujoco.mjtSolver.mjSOL_CG
         mj_model.opt.iterations = 6
@@ -398,7 +396,9 @@ class Quadcopter(PipelineEnv, ABC):
                                        minval=-self.cfg.system.reset_pose_error_pos * dr_scaling, 
                                        maxval=self.cfg.system.reset_pose_error_pos * dr_scaling)
 
-        omega = jax.random.uniform(rng_omega, (4,), minval=1000.0, maxval=1500.0)  # initial angular velocity in rad/s
+        # Initial motor angular velocity in rad/s. Sampled here (not inside state_info below) because
+        # get_obs() needs it as its second argument, and the first observation must match the state.
+        omega = jax.random.uniform(rng_omega, (4,), minval=1000.0, maxval=1500.0)
 
         obs = self.get_obs(data, omega, jnp.concatenate([jnp.zeros((5,15)).flatten(), jnp.zeros((10, 4)).flatten()]), aux_state, battery_level, jnp.zeros((10, 10)), pose_error, pos_error)
         reward, done, zero = jnp.zeros(3)

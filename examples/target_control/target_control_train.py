@@ -309,17 +309,15 @@ def main(cfg: omegaconf.DictConfig):
 
     times = [datetime.now()]
 
+    # Called by brax after every evaluation (num_evals times during training).
     def progress(num_steps, metrics):
-        print(num_steps)
         times.append(datetime.now())
+        print(f"steps={num_steps}  eval/episode_reward={float(metrics['eval/episode_reward']):.2f}")
 
-        logs = {k: v for k, v in metrics.items()}
-        logs["env_steps"] = num_steps
-
-        if wandb is not None:
+        if wandb is not None:  # only set when cfg.wandb_log is true
+            logs = {k: v for k, v in metrics.items()}
+            logs["env_steps"] = num_steps
             wandb.log(logs)
-        else:
-            print(f"steps={num_steps}  eval/episode_reward={float(metrics['eval/episode_reward']):.2f}")
 
     def policy_params_fn(current_step, make_policy, params):
         Path("checkpoints").mkdir(parents=True, exist_ok=True)

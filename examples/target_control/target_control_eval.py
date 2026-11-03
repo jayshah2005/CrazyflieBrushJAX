@@ -14,6 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 import hydra
+import hydra.utils
 import imageio_ffmpeg
 import jax
 import jax.numpy as jnp
@@ -143,7 +144,9 @@ def main(cfg: omegaconf.DictConfig):
     cfg.system.reset_motor_diff_scale = 0.0
 
     eval_env = QuadcopterTargetControl(cfg, config=NOMINAL_CONFIG)
-    policy, _ = load_policy(Path(cfg.eval_params).expanduser(), eval_env.observation_size, cfg)
+    # relative paths are relative to where the command was run, not hydra's output folder
+    params_path = Path(hydra.utils.to_absolute_path(str(Path(cfg.eval_params).expanduser())))
+    policy, _ = load_policy(params_path, eval_env.observation_size, cfg)
 
     jit_reset = jax.jit(eval_env.reset)
     jit_step = jax.jit(eval_env.step)
