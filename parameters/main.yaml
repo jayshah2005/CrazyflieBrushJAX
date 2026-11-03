@@ -34,9 +34,9 @@ experiment_file_label: training
 
 wandb_log: true
 wandb_project: "${experiment_file_label}"
-wandb_entity: "federated_learning_multi_hop"
+wandb_entity: "jayyshahhh-brock-university"
 
-root_dir: "/my_log_dir"
+root_dir: "${oc.env:HOME}/crazyflie_logs"
 
 hydra:
   job:

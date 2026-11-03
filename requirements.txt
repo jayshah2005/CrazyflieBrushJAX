@@ -3,7 +3,7 @@ annotated-types
 antlr4-python3-runtime
 asttokens
 blinker
-brax
+brax==0.14.2  # needs jax<0.10 (uses jax.device_put_replicated)
 certifi
 charset-normalizer
 chex
@@ -17,7 +17,8 @@ executing
 filelock
 Flask
 flask-cors
-flax
+flax==0.12.6  # newest flax that supports jax 0.9.x
+jax[cuda13]==0.9.2  # GPU build; brax 0.14.2 breaks on jax>=0.10
 fonttools
 fsspec
 gitdb
@@ -26,6 +27,7 @@ glfw
 humanize
 hydra-core
 idna
+imageio-ffmpeg  # bundled ffmpeg so mediapy can write eval videos
 importlib_resources
 ipython
 ipython_pygments_lexers
@@ -47,6 +49,7 @@ mpmath
 msgpack
 mujoco
 mujoco-mjx
+mujoco-warp
 multipledispatch
 mypy_extensions
 nest-asyncio

@@ -316,7 +316,10 @@ def main(cfg: omegaconf.DictConfig):
         logs = {k: v for k, v in metrics.items()}
         logs["env_steps"] = num_steps
 
-        wandb.log(logs)
+        if wandb is not None:
+            wandb.log(logs)
+        else:
+            print(f"steps={num_steps}  eval/episode_reward={float(metrics['eval/episode_reward']):.2f}")
 
     def policy_params_fn(current_step, make_policy, params):
         Path("checkpoints").mkdir(parents=True, exist_ok=True)

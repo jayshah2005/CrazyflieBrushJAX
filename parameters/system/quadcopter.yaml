@@ -1,6 +1,7 @@
 simulation_dt: 0.004
 use_delay_coord: true
-observe_omega: true
+observe_omega: false
+use_pose_delays: false  # observe pose from a delayed buffer instead of the true state
 
 reset_pos_x_range: [-6.0, 6.0]
 reset_pos_y_range: [-6.0, 6.0]

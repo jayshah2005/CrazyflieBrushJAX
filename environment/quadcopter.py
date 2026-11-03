@@ -211,7 +211,7 @@ class Quadcopter(PipelineEnv, ABC):
         self.cfg = cfg
 
         # this is needed to extract the auxiliary state from the state info.
-        self.__own_state_info_keys = ["rng", "action_delays", "action_delays_pwm", "action_delay", "action_delay_1", "action_delay_pwm", "action_1", "action_filtered", "state_delays", "battery_level", "action_delays_obs", "disturbance_freq", "disturbance_ampl", "current_time", "pose_error", "pos_error" "motor_ac", "motor_bc", "motor_a", "motor_b", "J_m", "Omega", "pose_delays"]
+        self.__own_state_info_keys = ["rng", "action_delays", "action_delays_pwm", "action_delay", "action_delay_1", "action_delay_pwm", "action_1", "action_filtered", "state_delays", "battery_level", "action_delays_obs", "disturbance_freq", "disturbance_ampl", "current_time", "pose_error", "pos_error", "motor_ac", "motor_bc", "motor_a", "motor_b", "J_m", "Omega", "pose_delays"]
 
         domain_randomization_amplitude = {"mass_body1": self.cfg.system.dr_mass_body, 
                                           "inertia": self.cfg.system.dr_inertia, 
@@ -398,7 +398,9 @@ class Quadcopter(PipelineEnv, ABC):
                                        minval=-self.cfg.system.reset_pose_error_pos * dr_scaling, 
                                        maxval=self.cfg.system.reset_pose_error_pos * dr_scaling)
 
-        obs = self.get_obs(data, jnp.concatenate([jnp.zeros((5,15)).flatten(), jnp.zeros((10, 4)).flatten()]), aux_state, battery_level, jnp.zeros((10, 10)), pose_error, pos_error)
+        omega = jax.random.uniform(rng_omega, (4,), minval=1000.0, maxval=1500.0)  # initial angular velocity in rad/s
+
+        obs = self.get_obs(data, omega, jnp.concatenate([jnp.zeros((5,15)).flatten(), jnp.zeros((10, 4)).flatten()]), aux_state, battery_level, jnp.zeros((10, 10)), pose_error, pos_error)
         reward, done, zero = jnp.zeros(3)
         metrics = self.init_metrics()
 
@@ -437,7 +439,7 @@ class Quadcopter(PipelineEnv, ABC):
             "motor_a": ad,
             "motor_b": bd,
             "J_m": J_m,
-            "Omega": jax.random.uniform(rng_omega, (4,), minval=1000.0, maxval=1500.0),  # initial angular velocity in rad/s
+            "Omega": omega,
         }
         state_info = state_info | aux_state
 

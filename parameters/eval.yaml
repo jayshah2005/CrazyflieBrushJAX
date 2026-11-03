@@ -1,0 +1,18 @@
+# Config for examples/target_control/target_control_eval.py.
+# Inherits everything from main.yaml (system, reward, root_dir, ...) so the
+# simulated drone matches the one the policy was trained on.
+defaults:
+  - main
+  - _self_
+
+# Policy to load. Default is the final policy of the training run; point it at
+# a file in .../checkpoints/ to evaluate an intermediate snapshot.
+eval_params: ${root_dir}/${experiment_file_label}/brax_save
+eval_episodes: 1         # number of rollouts (each with a different random seed)
+eval_time_per_waypoint: 4.0  # seconds spent flying to / holding each waypoint
+eval_show_plots: false   # also open the plots in a window (blocks until closed)
+
+# Write eval outputs to their own timestamped folder, not the training folder.
+hydra:
+  run:
+    dir: ${root_dir}/eval/${now:%Y-%m-%d_%H-%M-%S}
