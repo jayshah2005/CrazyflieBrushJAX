@@ -10,7 +10,8 @@ Clone the git repo and install the dependencies (Tested on Python 3.12)
 ```bash
 pip install -r requirements.txt
 ```
-This installs the CUDA 13 build of JAX (needs an NVIDIA driver with CUDA 13 support). Versions of jax, flax
+On Linux this installs the CUDA 13 build of JAX (needs an NVIDIA driver with CUDA 13 support; macOS and
+Windows get CPU-only JAX, enough for eval and export but not training). Versions of jax, flax
 and brax are pinned because brax 0.14.2 does not work with jax 0.10 or newer.
 
 # How to use it

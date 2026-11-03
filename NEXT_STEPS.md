@@ -72,8 +72,10 @@ pip install -r requirements.txt
 python -c "import jax; print(jax.devices())"   # should list a CudaDevice
 ```
 
-`jax[cuda13]` needs an NVIDIA driver that supports CUDA 13 (`nvidia-smi` shows the CUDA version). Without a
-GPU, JAX falls back to the CPU: evaluation and export still work, but training is far too slow.
+On Linux this installs the CUDA 13 build of JAX, which needs an NVIDIA driver that supports CUDA 13
+(`nvidia-smi` shows the CUDA version). The CUDA build only exists for Linux, so macOS and Windows get
+CPU-only JAX. That's enough for evaluation and export, but not for training. (The Linux install has been
+tested; macOS and Windows haven't.) **To only flash the firmware, you don't need Python at all.** See Step 3.
 
 ## Step 1: Check the policy in simulation
 
@@ -108,12 +110,26 @@ JAX policy (checked on 1000 random inputs; the expected difference is ~1e-6).
 The firmware is the authors' fork of the Bitcraze firmware:
 <https://github.com/Data-Science-in-Mechanical-Engineering/CrazyflieBrushJAX_firmware>
 
+Run every command in this step from the folder that contains both checkouts (`CrazyflieBrushJAX/` and
+`CrazyflieBrushJAX_firmware/`):
+
 ```bash
 git clone --recursive https://github.com/Data-Science-in-Mechanical-Engineering/CrazyflieBrushJAX_firmware.git
-cd CrazyflieBrushJAX
-python -m code_export.export_network_to_c --params trained_models/target_control/brax_save \
-    --firmware ../CrazyflieBrushJAX_firmware
 ```
+
+Put the network into the firmware. Either way gives the same files:
+
+- **No Python needed:** copy the committed, already-verified export of `trained_models/target_control/brax_save`.
+  It was generated for the firmware's `NUM_NN_INPUTS = 134`.
+  ```bash
+  cp CrazyflieBrushJAX/code_export/generated/nn.h CrazyflieBrushJAX_firmware/src/modules/interface/controller/nn.h
+  cp CrazyflieBrushJAX/code_export/generated/nn.c CrazyflieBrushJAX_firmware/src/modules/src/controller/nn.c
+  ```
+- **Re-export** (needed for any other policy):
+  ```bash
+  (cd CrazyflieBrushJAX && python -m code_export.export_network_to_c \
+      --params trained_models/target_control/brax_save --firmware ../CrazyflieBrushJAX_firmware)
+  ```
 
 With `--firmware`, the export also reads the firmware's `NUM_NN_INPUTS` (currently 134) and refuses on a
 mismatch. It then overwrites `src/modules/interface/controller/nn.h` and `src/modules/src/controller/nn.c`
@@ -123,7 +139,7 @@ Then build and flash with the standard Bitcraze workflow. You need the `arm-none
 for `cload`, the Crazyradio and `cfclient`/`cflib`. See the Bitcraze docs for setup.
 
 ```bash
-cd ../CrazyflieBrushJAX_firmware
+cd CrazyflieBrushJAX_firmware
 make cf21bl_defconfig
 make -j$(nproc)
 make cload           # put the Crazyflie in bootloader mode first
