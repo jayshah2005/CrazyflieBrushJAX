@@ -8,7 +8,10 @@ Writes a video (quad_<n>.mp4), plots (trajectory_<n>.png) and a CSV of the
 flight (trajectory_<n>.csv) to ${root_dir}/eval/<timestamp>/.
 """
 import os
-os.environ.setdefault("MUJOCO_GL", "egl")  # offscreen rendering, works without a display
+import platform
+if platform.system() == "Linux":
+    os.environ.setdefault("MUJOCO_GL", "egl")  # offscreen rendering, works without a display
+# elsewhere mujoco picks its own default (cgl on macOS, also offscreen)
 
 from datetime import datetime
 from pathlib import Path
