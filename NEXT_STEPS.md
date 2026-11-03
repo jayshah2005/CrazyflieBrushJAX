@@ -9,14 +9,39 @@ done, where the results are, and what's left before a real flight.
 | What | Where |
 |---|---|
 | Trained policy (final) | `trained_models/target_control/brax_save` |
-| Simulated test flight of that policy | `trained_models/target_control/eval/` (video, plots, CSV) |
+| Exact config it was trained with | `trained_models/target_control/training_config.yaml` |
+| Simulated test flights of that policy | `trained_models/target_control/eval/` (video, plots, CSV for 3 seeds) |
 | Policy exported to C, ready for the firmware | `code_export/generated/nn.h`, `code_export/generated/nn.c` |
 | Training outputs on the training machine | `~/crazyflie_logs/training/` (`brax_save`, `checkpoints/<step>`) |
 | Eval outputs on the training machine | `~/crazyflie_logs/eval/<timestamp>/` |
 
 ## Results
 
-_Filled in when training finishes._
+The policy in `trained_models/target_control/` was trained on 2026-11-03 with `observe_omega: false`
+(134 inputs, 4 hidden layers of 32, SiLU). It ran for 420M environment steps (~34 min on an RTX PRO 5000).
+
+**Training** (last evaluation, with domain randomization and noise on):
+
+- Episode reward: 4970. The first evaluation, before any learning, scored −210.
+- Average episode length: 1791 of 2000 steps, so some randomized episodes still end early.
+
+**Simulation test** (`target_control_eval`, nominal drone, no noise, 3 seeds):
+
+| | Result |
+|---|---|
+| Final distance to last waypoint | 2.5 – 2.8 cm on all 3 seeds |
+| Hover at (0, 0, 1) | steady, position error ≈ 0 |
+| 6 m jumps (x = 0 → 3 → −3 → 3) | reaches target in ≈ 1.5 s with little overshoot |
+| Peak speed / tilt | 5.5 m/s, ±45° pitch |
+| Worst moment | 3 → −3 m leg: yaw swings to −90°, roll −40°; last leg dips 35 cm (min altitude 0.64 m) |
+| C export vs JAX | max motor-command difference 1e-6 |
+
+See `trained_models/target_control/eval/trajectory_0.png` and `quad_0.mp4`.
+
+**Read this as:** the policy hovers and tracks well, but it handles large setpoint steps very aggressively. The
+6 m jumps in the eval are much bigger than anything you'd send in a mocap room. The motor commands also
+chatter by about ±5000 PWM even while hovering. For the first real flights, send small steps (≤ 0.5 m) or
+a smoothly moving setpoint, and watch for motor heat and vibration.
 
 ## What was fixed in this fork
 
@@ -130,7 +155,7 @@ position setpoint you send it.
 python -m examples.target_control.target_control_train
 ```
 
-This takes about 40 min on one RTX-class GPU (400M environment steps, 10 evaluations). Outputs go to
+This takes about 35 min on an RTX PRO 5000 (420M environment steps, 10 evaluations). Outputs go to
 `~/crazyflie_logs/training/`. **A new run writes into the same folder.** Old checkpoints stay there until each
 one is overwritten, so move the old folder away first if you want to keep it (or set
 `experiment_file_label=<name>`). Eval and export both refuse a checkpoint whose input size doesn't match the
