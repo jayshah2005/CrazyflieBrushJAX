@@ -9,6 +9,14 @@ defaults:
 # a file in .../checkpoints/ to evaluate an intermediate snapshot.
 eval_params: ${root_dir}/${experiment_file_label}/brax_save
 eval_episodes: 1         # number of rollouts (each with a different random seed)
+# Waypoints to fly to, one after another (x, y, z in metres). The drone starts
+# hovering at the first one.
+eval_waypoints:
+  - [0.0, 0.0, 1.1]
+  - [0.0, 0.0, 1.0]
+  - [3.0, 0.0, 1.0]
+  - [-3.0, 0.0, 1.0]
+  - [3.0, 0.0, 1.0]
 eval_time_per_waypoint: 4.0  # seconds spent flying to / holding each waypoint
 eval_show_plots: false   # also open the plots in a window (blocks until closed)
 

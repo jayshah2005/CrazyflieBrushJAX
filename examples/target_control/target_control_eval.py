@@ -3,6 +3,7 @@
 Usage:
     python -m examples.target_control.target_control_eval
     python -m examples.target_control.target_control_eval eval_params=$HOME/crazyflie_logs/training/checkpoints/420249600
+    python -m examples.target_control.target_control_eval 'eval_waypoints=[[0,0,1],[1,0,1],[0,0,1]]'
 
 Writes a video (quad_<n>.mp4), plots (trajectory_<n>.png) and a CSV of the
 flight (trajectory_<n>.csv) to ${root_dir}/eval/<timestamp>/.
@@ -41,12 +42,6 @@ media.set_ffmpeg(imageio_ffmpeg.get_ffmpeg_exe())
 # Nominal (system-identified) Crazyflie Brushless parameters from the authors.
 NOMINAL_CONFIG = {'mass_body1': np.float64(0.0455), 'inertia_x': np.float64(3.5e-05), 'inertia_y': np.float64(4.0e-05), 'inertia_z': np.float64(7.19e-5 * 0.82), 'mass_offsetx': np.float64(-0.001), 'mass_offsety': np.float64(-0.00021975373810106426 * 0), 'mass_offsetz': np.float64(-0.0045306701671183535 * 0), 'max_torque_multiplier1': np.float64(1.0), 'max_torque_multiplier2': np.float64(1.0), 'max_torque_multiplier3': np.float64(1.0), 'max_torque_multiplier4': np.float64(1.0), 'thrust_multiplier1': np.float64(1.0), 'thrust_multiplier2': np.float64(1.0), 'thrust_multiplier3': np.float64(1.0), 'thrust_multiplier4': np.float64(1.0), 'quadcopter_dimension': np.float64(0.0353 * 2), 'pwm_gamma': np.float64(0.0), 'pwm_gamma1': np.float64(0.5289172856266848), 'rotor_delay': np.float64(0.020447333042501376), 'position_body1': [-0.0010756468684873773, 0.007610250467330411, 11.013593944701656], 'quat_body1': [0.998843153797347, 0.006028605542538987, 0.015263499542348107, -0.04517776945862793], 'max_thrust1': 100000, 'mass_rotor1': 1e-05, "motor_a": 1 / 0.05, "motor_b": 2.9e3, "J_m": 0.5e-07 * 1e3}
 
-# Waypoints to fly to, one after another (x, y, z in metres).
-WAYPOINTS = np.array([[0.0, 0.0, 1.1],
-                      [0.0, 0.0, 1.0],
-                      [3.0, 0.0, 1.0],
-                      [-3.0, 0.0, 1.0],
-                      [3.0, 0.0, 1.0]])
 
 
 def load_policy(params_path: Path, env_obs_size: int, cfg):
@@ -154,8 +149,10 @@ def main(cfg: omegaconf.DictConfig):
     jit_reset = jax.jit(eval_env.reset)
     jit_step = jax.jit(eval_env.step)
 
+    # waypoints to fly to, one after another (x, y, z in metres)
+    waypoints = np.array(cfg.eval_waypoints, dtype=float)
     steps_per_segment = int(cfg.eval_time_per_waypoint / dt)
-    n_steps = steps_per_segment * len(WAYPOINTS)
+    n_steps = steps_per_segment * len(waypoints)
 
     camera = mujoco.MjvCamera()
     camera.lookat = [0, 0, 1.0]
@@ -169,14 +166,14 @@ def main(cfg: omegaconf.DictConfig):
 
         # start hovering at the first waypoint, level and at rest
         ps = state.pipeline_state
-        qpos = ps.qpos.at[0:3].set(WAYPOINTS[0]).at[3:7].set(jnp.array([1.0, 0.0, 0.0, 0.0]))
+        qpos = ps.qpos.at[0:3].set(waypoints[0]).at[3:7].set(jnp.array([1.0, 0.0, 0.0, 0.0]))
         qvel = ps.qvel.at[0:6].set(jnp.zeros(6))
         state = state.replace(pipeline_state=ps.replace(qpos=qpos, qvel=qvel))
 
         rollout = [state.pipeline_state]
         states, actions = [], []
         for step in range(n_steps):
-            current_target = WAYPOINTS[step // steps_per_segment]
+            current_target = waypoints[step // steps_per_segment]
             # The policy was trained to fly to (0, 0, 1). To fly to another waypoint, shift the
             # position it observes so that the waypoint appears to be at (0, 0, 1).
             state.info["pos_error"] = jnp.array([0.0, 0.0, 1.0]) - current_target
@@ -196,7 +193,7 @@ def main(cfg: omegaconf.DictConfig):
 
         states, actions = np.array(states), np.array(actions)
 
-        final_err = np.linalg.norm(states[-1, 0:3] - WAYPOINTS[-1])
+        final_err = np.linalg.norm(states[-1, 0:3] - waypoints[-1])
         print(f"Episode {episode}: final distance to last waypoint {final_err:.3f} m, "
               f"min altitude {states[:, 2].min():.2f} m")
 
@@ -205,7 +202,7 @@ def main(cfg: omegaconf.DictConfig):
         media.write_video(video_path, frames, fps=1.0 / dt / render_every)
 
         plot_path = out_dir / f"trajectory_{episode}.png"
-        euler = save_plots(plot_path, dt, states, actions, WAYPOINTS, steps_per_segment, cfg.eval_show_plots)
+        euler = save_plots(plot_path, dt, states, actions, waypoints, steps_per_segment, cfg.eval_show_plots)
 
         # every 5th step (50 Hz), same columns as the authors' sim log, for comparison with real flight logs
         csv_path = out_dir / f"trajectory_{episode}.csv"
